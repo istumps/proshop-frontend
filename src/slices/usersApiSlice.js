@@ -18,10 +18,18 @@ export const userApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     logout: builder.mutation({
-      query: () => ({
-        url: `${USERS_URL}/logout`,
-        method: 'POST',
-      }),
+      query: () => {
+        // Get the token from localStorage
+        const userInfo = localStorage.getItem('userInfo') 
+          ? JSON.parse(localStorage.getItem('userInfo')) 
+          : null;
+        
+        return {
+          url: `${USERS_URL}/logout`,
+          method: 'POST',
+          body: { token: userInfo?.token || '' },
+        };
+      },
     }),
     profile: builder.mutation({
       query: (data) => ({

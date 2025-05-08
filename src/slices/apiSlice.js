@@ -10,6 +10,17 @@ import { logout } from './authSlice'; // Import the logout action
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
+  prepareHeaders: (headers, { getState }) => {
+    // Try to get the token from the Redux state
+    const token = getState()?.auth?.userInfo?.token;
+    
+    // If we have a token set in state, let's assume that we should be passing it
+    if (token) {
+      headers.set('authorization', `Bearer ${token}`);
+    }
+    
+    return headers;
+  },
 });
 
 async function baseQueryWithAuth(args, api, extra) {

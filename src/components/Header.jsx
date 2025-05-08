@@ -1,33 +1,19 @@
 import { Navbar, Nav, Container, NavDropdown, Badge } from 'react-bootstrap';
-import { FaShoppingCart, FaUser } from 'react-icons/fa';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
-import { useLogoutMutation } from '../slices/usersApiSlice';
-import { logout } from '../slices/authSlice';
+import { FaShoppingCart, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { useLogout } from '../utils/logoutUtils';
+import LogoutButton from './LogoutButton';
 import SearchBox from './SearchBox';
 import logo from '../assets/logo.png';
-import { resetCart } from '../slices/cartSlice';
 
 const Header = () => {
   const { cartItems } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const [logoutApiCall] = useLogoutMutation();
+  const logout = useLogout();
 
   const logoutHandler = async () => {
-    try {
-      await logoutApiCall().unwrap();
-      dispatch(logout());
-      // NOTE: here we need to reset cart state for when a user logs out so the next
-      // user doesn't inherit the previous users cart and shipping
-      dispatch(resetCart());
-      navigate('/login');
-    } catch (err) {
-      console.error(err);
-    }
+    await logout('/');
   };
 
   return (
@@ -50,6 +36,7 @@ const Header = () => {
                   </Badge>
                 )}
               </Nav.Link>
+              
               {userInfo ? (
                 <>
                   <NavDropdown title={userInfo.name} id='username'>
@@ -60,6 +47,16 @@ const Header = () => {
                       Logout
                     </NavDropdown.Item>
                   </NavDropdown>
+                  
+                  <div className="d-flex align-items-center ms-2">
+                    <LogoutButton 
+                      variant="outline-light" 
+                      size="sm"
+                      className="d-flex align-items-center"
+                    >
+                      <FaSignOutAlt className="me-1" /> Logout
+                    </LogoutButton>
+                  </div>
                 </>
               ) : (
                 <Nav.Link as={Link} to='/login'>

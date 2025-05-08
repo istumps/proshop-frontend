@@ -66,12 +66,12 @@ const cartSlice = createSlice({
     
     saveShippingAddress: (state, action) => {
       state.shippingAddress = action.payload;
-      localStorage.setItem('cart', JSON.stringify(state));
+      return updateCart(state);
     },
     
     savePaymentMethod: (state, action) => {
       state.paymentMethod = action.payload;
-      localStorage.setItem('cart', JSON.stringify(state));
+      return updateCart(state);
     },
     
     clearCartItems: (state, action) => {
@@ -80,11 +80,22 @@ const cartSlice = createSlice({
     },
     
     resetCart: (state) => {
-      state.cartItems = [];
-      state.shippingAddress = {};
-      state.paymentMethod = 'PayPal';
+      // Don't modify the state - ONLY return a new state object
+      console.log('Cart completely reset');
+      
+      // Clear local storage cart data
       localStorage.removeItem('cart');
-      return state;
+      
+      // Return a new state object
+      return {
+        cartItems: [],
+        shippingAddress: {},
+        paymentMethod: 'PayPal',
+        itemsPrice: '0.00',
+        shippingPrice: '0.00',
+        taxPrice: '0.00',
+        totalPrice: '0.00',
+      };
     },
   },
 });
