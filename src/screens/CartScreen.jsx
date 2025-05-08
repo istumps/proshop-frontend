@@ -20,14 +20,30 @@ const CartScreen = () => {
   const cart = useSelector((state) => state.cart);
   const { cartItems } = cart;
 
+  // Log cart items for debugging
+  console.log('Current cart items:');
+  cartItems.forEach((item, index) => {
+    console.log(`Item ${index}: ID=${item._id}, Name=${item.name}, Qty=${item.qty}`);
+  });
+
   // NOTE: no need for an async function here as we are not awaiting the
   // resolution of a Promise
   const addToCartHandler = (product, qty) => {
+    console.log('Updating quantity for:', product.name, 'to', qty);
+    // When changing quantity, we just want to update the qty property
+    // while keeping all other properties unchanged
     dispatch(addToCart({ ...product, qty }));
   };
 
-  const removeFromCartHandler = (id) => {
-    dispatch(removeFromCart(id));
+  const removeFromCartHandler = (index) => {
+    console.log('Removing cart item at index:', index);
+    // Get the item at this index
+    const item = cartItems[index];
+    if (item) {
+      dispatch(removeFromCart(index));
+    } else {
+      console.error('Item not found at index:', index);
+    }
   };
 
   const checkoutHandler = () => {
@@ -44,8 +60,8 @@ const CartScreen = () => {
           </Message>
         ) : (
           <ListGroup variant='flush'>
-            {cartItems.map((item) => (
-              <ListGroup.Item key={item._id}>
+            {cartItems.map((item, index) => (
+              <ListGroup.Item key={`cart-item-${index}`}>
                 <Row>
                   <Col md={2}>
                     <Image src={item.image} alt={item.name} fluid rounded />
@@ -63,7 +79,7 @@ const CartScreen = () => {
                       }
                     >
                       {[...Array(item.countInStock).keys()].map((x) => (
-                        <option key={x + 1} value={x + 1}>
+                        <option key={`qty-${index}-${x + 1}`} value={x + 1}>
                           {x + 1}
                         </option>
                       ))}
@@ -72,10 +88,15 @@ const CartScreen = () => {
                   <Col md={2}>
                     <Button
                       type='button'
-                      variant='light'
-                      onClick={() => removeFromCartHandler(item._id)}
+                      variant='danger'
+                      className="btn-sm"
+                      onClick={() => {
+                        console.log('Remove button clicked for:', item.name, 'at index:', index);
+                        // Use index for removal instead of ID
+                        removeFromCartHandler(index);
+                      }}
                     >
-                      <FaTrash />
+                      <FaTrash /> Remove
                     </Button>
                   </Col>
                 </Row>
