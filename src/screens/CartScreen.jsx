@@ -29,9 +29,6 @@ const CartScreen = () => {
   // NOTE: no need for an async function here as we are not awaiting the
   // resolution of a Promise
   const addToCartHandler = (product, qty) => {
-    console.log('Updating quantity for:', product.name, 'to', qty);
-    // When changing quantity, we just want to update the qty property
-    // while keeping all other properties unchanged
     dispatch(addToCart({ ...product, qty }));
   };
 

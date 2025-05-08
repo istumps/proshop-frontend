@@ -33,28 +33,13 @@ const cartSlice = createSlice({
   reducers: {
     addToCart: (state, action) => {
       const { user, rating, numReviews, reviews, ...item } = action.payload;
-      
-      // Check if the item already exists in the cart by ID
-      const existingItemIndex = state.cartItems.findIndex(
-        (x) => x._id === item._id
-      );
-      
-      if (existingItemIndex !== -1) {
-        // Item exists, update only its quantity
-        console.log(`Updating item at index ${existingItemIndex} with qty: ${item.qty}`);
-        
-        // Create a new array with the updated item
-        const updatedItems = [...state.cartItems];
-        // Only update the qty property while preserving other properties
-        updatedItems[existingItemIndex] = {
-          ...updatedItems[existingItemIndex],
-          qty: item.qty
-        };
-        
-        state.cartItems = updatedItems;
+      const existItem = state.cartItems.find((x) => x._id === item._id);
+
+      if (existItem) {
+        state.cartItems = state.cartItems.map((x) =>
+          x._id === existItem._id ? item : x
+        );
       } else {
-        // Item doesn't exist, add it to the cart
-        console.log('Adding new item to cart:', item.name);
         state.cartItems = [...state.cartItems, item];
       }
 
@@ -81,12 +66,12 @@ const cartSlice = createSlice({
     
     saveShippingAddress: (state, action) => {
       state.shippingAddress = action.payload;
-      return updateCart(state);
+      localStorage.setItem('cart', JSON.stringify(state));
     },
     
     savePaymentMethod: (state, action) => {
       state.paymentMethod = action.payload;
-      return updateCart(state);
+      localStorage.setItem('cart', JSON.stringify(state));
     },
     
     clearCartItems: (state, action) => {
